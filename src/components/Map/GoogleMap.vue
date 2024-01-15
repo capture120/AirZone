@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// import '@googlemaps/extended-component-library/overlay_layout.js';
-// import '@googlemaps/extended-component-library/api_loader.js';
 
 import { Loader } from '@googlemaps/js-api-loader'
 import { onMounted } from 'vue';
@@ -32,13 +30,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- <gmpx-api-loader key="AIzaSyAbcRcBKY1Q5knGDie9IVfviuhXRI1zAaI"/>
-  <gmpx-split-layout>
-    <gmpx-place-overview slot="fixed" place="ChIJ39Y-tdg1fYcRQcZcBb499do"></gmpx-place-overview>
-    <gmp-map slot="main" center="43.880,-103.459" zoom="10" map-id="eed0a5d7278df36b">
-      <gmp-advanced-marker position="43.880,-103.459"></gmp-advanced-marker>
-    </gmp-map>
-  </gmpx-split-layout> -->
   <div>
     <div class="google-map" id="map" ></div>
   </div>
