@@ -15,6 +15,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@googlemaps/extended-component-library": "^0.6.4",
     "@googlemaps/js-api-loader": "^1.16.2",
     "pinia": "^2.1.7",
     "vue": "^3.3.11",
