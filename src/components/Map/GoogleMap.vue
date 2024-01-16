@@ -7,37 +7,22 @@ const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID;
 
 const loader = new Loader({ apiKey: GOOGLE_MAPS_API_KEY })
+// MITRE cords
 // const position = { lat: -25.344, lng: 131.031 };
-const position = { lat: 37.774546, lng: -122.433523};
+// San Francisco cords
+// const position = { lat: 37.774546, lng: -122.433523};
 
-function getPoints():  google.maps.MVCArray<google.maps.LatLng | google.maps.visualization.WeightedLocation> | (google.maps.LatLng | google.maps.visualization.WeightedLocation)[] | null | undefined {
-  return [
-    {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
-    new google.maps.LatLng(37.782, -122.445),
-    {location: new google.maps.LatLng(37.782, -122.443), weight: 2},
-    {location: new google.maps.LatLng(37.782, -122.441), weight: 3},
-    {location: new google.maps.LatLng(37.782, -122.439), weight: 2},
-    new google.maps.LatLng(37.782, -122.437),
-    {location: new google.maps.LatLng(37.782, -122.435), weight: 0.5},
-
-    {location: new google.maps.LatLng(37.785, -122.447), weight: 3},
-    {location: new google.maps.LatLng(37.785, -122.445), weight: 2},
-    new google.maps.LatLng(37.785, -122.443),
-    {location: new google.maps.LatLng(37.785, -122.441), weight: 0.5},
-    new google.maps.LatLng(37.785, -122.439),
-    {location: new google.maps.LatLng(37.785, -122.437), weight: 2},
-    {location: new google.maps.LatLng(37.785, -122.435), weight: 3}
-  ];
-}
+// alt cords
+const position = {lat: -33, lng: 151}
 
 onMounted(async () => {
   const { Map } = await loader.importLibrary("maps");
   const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
-  const { HeatmapLayer } = await google.maps.importLibrary("visualization") as google.maps.VisualizationLibrary;
+  // const { HeatmapLayer } = await google.maps.importLibrary("visualization") as google.maps.VisualizationLibrary;
   const map = new Map(
     document.getElementById('map') as HTMLElement,
     {
-      zoom: 7,
+      zoom: 4,
       center: position,
       mapId: GOOGLE_MAP_ID,
     }
@@ -49,14 +34,38 @@ onMounted(async () => {
     title: 'The MITRE Corporation'
   });
 
-  const heatmap = new HeatmapLayer({
-    data: getPoints(),
-    map: map,
+  // const heatmap = new HeatmapLayer({
+  //   data: getPoints(),
+  //   map: map,
+  // });
+
+  // Define the heatmap tile URL pattern
+  let heatmapTileURL = 'https://pollen.googleapis.com/v1/mapTypes/TYPE/heatmapTiles/{z}/{x}/{y}?key=API_KEY';
+
+  /*
+  TREE_UPI
+  GRASS_UPI
+  WEED_UPI
+  */
+  heatmapTileURL = heatmapTileURL.replace('TYPE', 'TREE_UPI');
+  heatmapTileURL = heatmapTileURL.replace('API_KEY', GOOGLE_MAPS_API_KEY);
+
+  // Create a new ImageMapType with the heatmap tile URL
+  let heatmapLayer = new google.maps.ImageMapType({
+    getTileUrl: function(coord, zoom) {
+      // @ts-ignore
+      return heatmapTileURL.replace('{z}', zoom).replace('{x}', coord.x).replace('{y}', coord.y);
+    },
+    tileSize: new google.maps.Size(256, 256),
   });
 
+  // Overlay the heatmap tiles on the map
+  map.overlayMapTypes.insertAt(0, heatmapLayer);
+
+  /*
   function toggleHeatmap(): void {
   heatmap.setMap(heatmap.getMap() ? null : map);
-}
+  }
 
   function changeGradient(): void {
     const gradient = [
@@ -99,6 +108,7 @@ onMounted(async () => {
   document
     .getElementById("change-radius")!
     .addEventListener("click", changeRadius);
+  */
 });
 </script>
 
