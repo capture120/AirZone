@@ -6,7 +6,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <template>
   <header>
     <div class="wrapper">
-      <HelloWorld msg="Collision Mapper" />
+      <HelloWorld msg="Air Quality Tracker" />
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
