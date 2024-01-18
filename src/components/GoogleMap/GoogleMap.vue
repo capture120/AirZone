@@ -2,7 +2,9 @@
 import { Loader } from '@googlemaps/js-api-loader'
 import { onMounted } from 'vue'
 
+// @ts-ignore
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
+// @ts-ignore
 const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID as string
 
 const loader = new Loader({ apiKey: GOOGLE_MAPS_API_KEY })
