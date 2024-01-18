@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import NavBar from './components/NavBar.vue'
 </script>
 
 <template>
   <header>
     <div class="wrapper">
-      <HelloWorld msg="Air Quality Tracker" />
+      <NavBar msg="AirZone" />
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
