@@ -6,12 +6,6 @@ const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID as string
 
 const loader = new Loader({ apiKey: GOOGLE_MAPS_API_KEY })
-/*
-// MITRE cords
-// const position = { lat: -25.344, lng: 131.031 };
-// San Francisco cords
-// const position = { lat: 37.774546, lng: -122.433523};
-*/
 
 // alt cords
 const position = { lat: -33, lng: 151 }
@@ -24,7 +18,7 @@ onMounted(async () => {
   const map = new Map(document.getElementById('map') as HTMLElement, {
     zoom: 4,
     center: position,
-    mapId: GOOGLE_MAP_ID
+    mapId: GOOGLE_MAP_ID,
   })
 
   new AdvancedMarkerElement({
@@ -42,7 +36,7 @@ onMounted(async () => {
   GRASS_UPI
   WEED_UPI
   */
-  heatmapTileURL = heatmapTileURL.replace('TYPE', 'TREE_UPI')
+  heatmapTileURL = heatmapTileURL.replace('TYPE', 'GRASS_UPI')
   heatmapTileURL = heatmapTileURL.replace('API_KEY', GOOGLE_MAPS_API_KEY)
 
   // Create a new ImageMapType with the heatmap tile URL
@@ -53,6 +47,7 @@ onMounted(async () => {
     },
     tileSize: new google.maps.Size(256, 256)
   })
+  pollenHeatmapLayer.setOpacity(0.5);
 
   // Overlay the heatmap tiles on the map
   map.overlayMapTypes.insertAt(0, pollenHeatmapLayer)
@@ -69,21 +64,22 @@ onMounted(async () => {
     const opacity = pollenHeatmapLayer.getOpacity()
     switch (opacity) {
       case 0:
-        pollenHeatmapLayer.setOpacity(0.25)
+        pollenHeatmapLayer.setOpacity(0.2)
         break
-      case 0.25:
+      case 0.2:
+        pollenHeatmapLayer.setOpacity(0.35)
+        break
+      case 0.35:
         pollenHeatmapLayer.setOpacity(0.5)
         break
       case 0.5:
-        pollenHeatmapLayer.setOpacity(0.75)
+        pollenHeatmapLayer.setOpacity(.7)
         break
-      case 0.75:
-        pollenHeatmapLayer.setOpacity(1)
-        break
-      case 1:
+      case 0.7:
         pollenHeatmapLayer.setOpacity(0)
         break
       default:
+        pollenHeatmapLayer.setOpacity(0.2)
         break
     }
   }
