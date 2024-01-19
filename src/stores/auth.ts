@@ -3,6 +3,8 @@ import { defineStore } from 'pinia'
 import type { User } from '@/types/global-types'
 import axios from 'axios'
 
+const REST_API_URL = import.meta.env.VITE_REST_API_URL
+
 export const useAuthStore = defineStore('user', () => {
   /* State */
   const user = reactive(null as unknown as User)
@@ -22,7 +24,7 @@ export const useAuthStore = defineStore('user', () => {
       return;
     }
 
-    axios.post(import.meta.env)
+    axios.post(REST_API_URL + 'user')
   }
   
   function signin() {
@@ -33,5 +35,5 @@ export const useAuthStore = defineStore('user', () => {
     
   }
 
-  return { user, getUsername, }
+  return { user, getUsername, register, signin, logout}
 })
