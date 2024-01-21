@@ -159,7 +159,46 @@ onMounted(async () => {
   }
 })
 
+function handleSelecting() {
+  isSelecting.value = true
+  const currentBounds = map.getBounds()
+  let north = currentBounds?.getCenter().lat() as number
+  let east = currentBounds?.getCenter().lng() as number
+  let south = currentBounds?.getCenter().lat() as number
+  let west = currentBounds?.getCenter().lng() as number
+  const center = currentBounds?.getCenter();
+  const currentZoom = map.getZoom() as number;
+  const scale = (1/((currentZoom ** 2)))*(24/currentZoom)
 
+  // console.log(`North ${north}\n`, `South ${south}\n`, `East ${east}\n`,`west ${west}`)
+  // console.log(`north ${north-scale}\n`, `south ${south+scale}\n`, `east ${east-scale}\n`, `west ${west+scale}\n`);
+  // console.log(currentZoom);
+  // console.log(scale)
+  // console.log(center?.lat(), center?.lng());
+
+  /*
+  north/south is different than x-y for google maps 
+  since latitude and longitude is used
+  */
+  locationSelector.setBounds({
+    north: north-scale, // decrease -> moves latitude down
+    east: east+scale, // increase -> moves longitude right
+    south: south+scale, // increase -> moves latitude up
+    west: west-scale, // decrease -> moves longitude left
+  })
+  locationSelector.setVisible(true)
+}
+
+function handleCancelSelection() {
+  isSelecting.value = false
+  locationSelector.setVisible(false)
+}
+
+function handleSaveLocation() {
+  if (!isSelecting.value) {
+    return
+  }
+}
 </script>
 
 <template>
