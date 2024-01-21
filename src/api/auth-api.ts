@@ -8,7 +8,7 @@ const authApi = axios.create({
 })
 
 export const register = async (username: string, password: string) => {
-  const response = await authApi.post(`/register`, { username, password })
+  const response = await authApi.post(`/register`, { username, password, savedLocations: [] })
   return response.data as User
 }
 

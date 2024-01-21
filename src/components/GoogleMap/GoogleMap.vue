@@ -2,27 +2,37 @@
 import { Loader } from '@googlemaps/js-api-loader'
 import { onMounted } from 'vue'
 import { ref } from 'vue'
-import { type SelectionBoundary } from '../../types/global-types'
+import { type SelectionBoundary, type Location } from '../../types/global-types'
+import * as locationApi from '../../api/location-api'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID as string
-const loader = new Loader({ apiKey: GOOGLE_MAPS_API_KEY })
+const loader = new Loader({ apiKey: GOOGLE_MAPS_API_KEY });
+const auth = useAuthStore();
+const router = useRouter()
 let map: google.maps.Map
 let locationSelector: google.maps.Rectangle
+let heatmapTileURL: string
+let pollenHeatmapLayer: google.maps.ImageMapType
+let heatmapXCord: number
+let heatmapYCord: number
+let heatmapZoom: number
 
 /* Map Default Position */
 const lat = 41.85
 const lng = -87.65
 const position = { lat: lat, lng: lng }
+
 /* Map Selection  */
-/* North east -> top right point = 41.85, -87.65 */
 let selectBounds: SelectionBoundary
-let bounds = [
-  { lat: lat, lng: lng },
-  { lat: lat, lng: lng },
-  { lat: lat, lng: lng },
-  { lat: lat, lng: lng }
-]
+let bounds = {
+  north: 85.05,
+  south: -83,
+  east: 180,
+  west: -180
+}
 const isSelecting = ref(false)
 
 onMounted(async () => {
@@ -33,10 +43,10 @@ onMounted(async () => {
     mapId: GOOGLE_MAP_ID,
     minZoom: 3,
     maxZoom: 16,
-    // restriction: {
-    // latLngBounds: bounds,
-    // strictBounds: false,
-    // }
+    restriction: {
+      latLngBounds: bounds,
+      strictBounds: true
+    },
     fullscreenControl: false,
     streetViewControl: false,
     scaleControl: false
@@ -55,11 +65,19 @@ onMounted(async () => {
   y-axis goes down as y value increases (top to bottom) 
   x-axis goes left to right
   */
-  let heatmapTileURL = `https://pollen.googleapis.com/v1/mapTypes/${pollenType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
+  heatmapTileURL = `https://pollen.googleapis.com/v1/mapTypes/${pollenType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
 
   // Create a new ImageMapType with the heatmap tile URL
-  let pollenHeatmapLayer = new google.maps.ImageMapType({
+  pollenHeatmapLayer = new google.maps.ImageMapType({
     getTileUrl: function (coord, zoom) {
+      let north = map.getBounds()?.getNorthEast().lat() as number
+      let south = map.getBounds()?.getSouthWest().lat() as number
+      if (north > 80 || south < -80) {
+        return ''
+      }
+      heatmapXCord = coord.x
+      heatmapYCord = coord.y
+      heatmapZoom = zoom
       // @ts-ignore
       return heatmapTileURL.replace('{z}', zoom).replace('{x}', coord.x).replace('{y}', coord.y)
     },
@@ -105,7 +123,6 @@ onMounted(async () => {
   document.getElementById('toggle-opacity')!.addEventListener('click', toggleOpacity)
 
   /* Location Saving */
-
   locationSelector = new google.maps.Rectangle({
     map: map,
     bounds: selectBounds,
@@ -115,7 +132,6 @@ onMounted(async () => {
   })
 
   /* User Position Focus */
-  const errorWindow = new google.maps.InfoWindow()
   const locationButton = document.createElement('button')
 
   locationButton.textContent = 'View Current Location'
@@ -133,30 +149,13 @@ onMounted(async () => {
             lng: position.coords.longitude
           }
 
+          map.setZoom(11)
           map.setCenter(pos)
         },
-        () => {
-          handleLocationError(true, errorWindow, map.getCenter()!)
-        }
+        () => {}
       )
-    } else {
-      // Browser doesn't support Geolocation
-      handleLocationError(false, errorWindow, map.getCenter()!)
     }
   })
-  function handleLocationError(
-    browserHasGeolocation: boolean,
-    infoWindow: google.maps.InfoWindow,
-    pos: google.maps.LatLng
-  ) {
-    infoWindow.setPosition(pos)
-    infoWindow.setContent(
-      browserHasGeolocation
-        ? 'Error: The Geolocation service failed.'
-        : "Error: Your browser doesn't support geolocation."
-    )
-    infoWindow.open(map)
-  }
 })
 
 function handleSelecting() {
@@ -166,25 +165,18 @@ function handleSelecting() {
   let east = currentBounds?.getCenter().lng() as number
   let south = currentBounds?.getCenter().lat() as number
   let west = currentBounds?.getCenter().lng() as number
-  const center = currentBounds?.getCenter();
-  const currentZoom = map.getZoom() as number;
-  const scale = (1/((currentZoom ** 2)))*(24/currentZoom)
-
-  // console.log(`North ${north}\n`, `South ${south}\n`, `East ${east}\n`,`west ${west}`)
-  // console.log(`north ${north-scale}\n`, `south ${south+scale}\n`, `east ${east-scale}\n`, `west ${west+scale}\n`);
-  // console.log(currentZoom);
-  // console.log(scale)
-  // console.log(center?.lat(), center?.lng());
+  const currentZoom = map.getZoom() as number
+  const scale = (1 / currentZoom ** 2) * (24 / currentZoom)
 
   /*
   north/south is different than x-y for google maps 
   since latitude and longitude is used
   */
   locationSelector.setBounds({
-    north: north-scale, // decrease -> moves latitude down
-    east: east+scale, // increase -> moves longitude right
-    south: south+scale, // increase -> moves latitude up
-    west: west-scale, // decrease -> moves longitude left
+    north: north - scale, // decrease -> moves latitude down
+    east: east + scale, // increase -> moves longitude right
+    south: south + scale, // increase -> moves latitude up
+    west: west - scale // decrease -> moves longitude left
   })
   locationSelector.setVisible(true)
 }
@@ -194,10 +186,43 @@ function handleCancelSelection() {
   locationSelector.setVisible(false)
 }
 
-function handleSaveLocation() {
+async function handleSaveLocation() {
   if (!isSelecting.value) {
-    return
+    return;
   }
+  if (!auth.$state.session.user){
+    router.push({ path: '/signin' });
+    return;
+  } 
+  const currentBounds = locationSelector.getBounds()
+  const north = currentBounds?.getCenter().lat() as number
+  const east = currentBounds?.getCenter().lng() as number
+  const south = currentBounds?.getCenter().lat() as number
+  const west = currentBounds?.getCenter().lng() as number
+  const center = currentBounds?.getCenter()
+  // pollenHeatmapLayer.get('')
+  const savedLocation = {
+    lat: center?.lat(),
+    lng: center?.lng(),
+    zoom: heatmapZoom,
+    boundNorth: north,
+    boundSouth: south,
+    boundEast: east,
+    boundWest: west,
+    heatmapGridSizeX: heatmapXCord,
+    heatmapGridSizeY: heatmapYCord,
+    title: 'default'
+  } as Location
+  const location = await locationApi.saveLocation(savedLocation)
+
+  if (!location) {
+    alert('Saving location failed.')
+  } else {
+    alert('Location saved.')
+  }
+  isSelecting.value=false
+  locationSelector.setVisible(false);
+  // console.log(`North ${north}\n`, `South ${south}\n`, `East ${east}\n`,`west ${west}`)
 }
 </script>
 
@@ -211,7 +236,7 @@ function handleSaveLocation() {
     <button v-if="isSelecting" id="cancel-select-location" @click="handleCancelSelection">
       Cancel
     </button>
-    <button v-if="isSelecting" id="save-location">Save Location</button>
+    <button v-if="isSelecting" id="save-location" @click="handleSaveLocation">Save Location</button>
   </div>
   <div>
     <div class="google-map" id="map"></div>
