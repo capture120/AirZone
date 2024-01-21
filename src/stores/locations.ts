@@ -13,13 +13,9 @@ export const useLocationStore = defineStore('location', () => {
   const session = reactive({ savedLocations: [] } as LocationSession)
 
   /* Getters */
-  const getSavedLocations = computed(async () => {
+  const getSavedLocations = computed(() => {
     if (auth.$state.session.user) {
-        const userInfo = await details();
-        if (userInfo) {
-            session.savedLocations = userInfo.savedLocations;
-            return userInfo.savedLocations;
-        }
+      return session.savedLocations;
     } 
     return [];
   })
@@ -37,5 +33,15 @@ export const useLocationStore = defineStore('location', () => {
       } 
   }
 
-  return { session: session, getSavedLocations: getSavedLocations, savedLocation:savedLocation }
+  /* Gets the most up-to-date locations the user has saved */
+  async function updateLatestLocations() {
+    if (auth.$state.session.user) {
+      const userInfo = await details();
+      if (userInfo) {
+          session.savedLocations = userInfo.savedLocations;
+      }
+    } 
+  }
+
+  return { session: session, getSavedLocations: getSavedLocations, savedLocation:savedLocation, updateLatestLocations: updateLatestLocations }
 })

@@ -9,8 +9,8 @@ const locationStore = useLocationStore();
 const user = reactive({} as LocationSession)
 
 onMounted(async () => {
-  const userLocations = await locationStore.getSavedLocations;
-  user.savedLocations = userLocations;
+  await locationStore.updateLatestLocations();
+  user.savedLocations = locationStore.getSavedLocations;
 })
 </script>
 
@@ -19,7 +19,7 @@ onMounted(async () => {
     <h1>This is the Home Page</h1>
   </div>
   <div>
-    <ul v-if="authStore.$state.session.user">
+    <ul v-if="authStore.$state.session.user" >
         <li v-for="location in user.savedLocations" v-bind:key="location._id">
           {{ location.lat }} {{ location.lng }}
         </li>
@@ -34,5 +34,10 @@ onMounted(async () => {
     display: flex;
     align-items: center;
   }
+}
+
+ul, li {
+  margin-left: 0;
+  padding-left: 0;
 }
 </style>
