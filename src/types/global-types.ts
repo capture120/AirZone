@@ -8,7 +8,12 @@ export interface User {
   savedLocations: Array<Location>
 }
 
+export interface LocationSession {
+  savedLocations: Location[]
+}
+
 export interface Location {
+  _id: string
   lat: number
   lng: number
   zoom: number

@@ -3,14 +3,16 @@ import { Loader } from '@googlemaps/js-api-loader'
 import { onMounted } from 'vue'
 import { ref } from 'vue'
 import { type SelectionBoundary, type Location } from '../../types/global-types'
-import * as locationApi from '../../api/location-api'
 import { useAuthStore } from '@/stores/auth'
+import { useLocationStore } from '@/stores/locations'
 import { useRouter } from 'vue-router'
+
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID as string
 const loader = new Loader({ apiKey: GOOGLE_MAPS_API_KEY });
-const auth = useAuthStore();
+const authStore = useAuthStore();
+const locationStore = useLocationStore();
 const router = useRouter()
 let map: google.maps.Map
 let locationSelector: google.maps.Rectangle
@@ -190,7 +192,7 @@ async function handleSaveLocation() {
   if (!isSelecting.value) {
     return;
   }
-  if (!auth.$state.session.user){
+  if (!authStore.$state.session.user){
     router.push({ path: '/signin' });
     return;
   } 
@@ -200,7 +202,6 @@ async function handleSaveLocation() {
   const south = currentBounds?.getCenter().lat() as number
   const west = currentBounds?.getCenter().lng() as number
   const center = currentBounds?.getCenter()
-  // pollenHeatmapLayer.get('')
   const savedLocation = {
     lat: center?.lat(),
     lng: center?.lng(),
@@ -213,7 +214,7 @@ async function handleSaveLocation() {
     heatmapGridSizeY: heatmapYCord,
     title: 'default'
   } as Location
-  const location = await locationApi.saveLocation(savedLocation)
+  await locationStore.savedLocation(savedLocation)
 
   if (!location) {
     alert('Saving location failed.')

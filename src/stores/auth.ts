@@ -25,21 +25,21 @@ export const useAuthStore = defineStore('user', () => {
       !userDetails.password ||
       session.user
     ) {
-      return
+      return;
     }
-    const registeredUser = await authApi.register(userDetails.username, userDetails.password)
+    const registeredUser = await authApi.register(userDetails.username, userDetails.password);
     if (registeredUser) {
-      session.user = registeredUser
+      session.user = registeredUser;
     }
   }
 
   async function signin(userDetails: User) {
     if (userDetails.username == '' || userDetails.password == '' || !userDetails.password) {
-      return
+      return;
     }
     const signedinUser = await authApi.signin(userDetails.username, userDetails.password)
     if (signedinUser) {
-      session.user = signedinUser
+      session.user = signedinUser;
     }
   }
 
