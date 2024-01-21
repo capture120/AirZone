@@ -1,11 +1,29 @@
+export interface UserSession {
+  user: User | null
+}
+
 export interface User {
-    username: String,
-    password: String | null,
-    savedLocations: Array<Location>
+  username: string
+  password: string | null
+  savedLocations: Array<Location>
 }
 
 export interface Location {
-    lat: Number
-    lng: Number
-    title: String
+  lat: number
+  lng: number
+  zoom: number
+  title: string
+  boundNorth: number
+  boundSouth: number
+  boundWest: number
+  boundEast: number
+  heatmapGridSizeX: number
+  heatmapGridSizeY: number
+}
+
+export type SelectionBoundary = {
+  north: number
+  south: number
+  east: number
+  west: number
 }

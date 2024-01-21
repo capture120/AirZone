@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { useAuthStore } from './stores/auth'
 import NavBar from './components/NavBar.vue'
+
+const auth = useAuthStore()
+
+async function logout() {
+  await auth.logout()
+}
 </script>
 
 <template>
@@ -10,7 +17,12 @@ import NavBar from './components/NavBar.vue'
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/map">Map</RouterLink>
+        <RouterLink v-if="!auth.$state.session.user" to="/signin">Sign-in</RouterLink>
+        <RouterLink v-if="auth.$state.session.user" to="/" @click="logout">Log Out</RouterLink>
+        <label v-if="auth.$state.session.user"
+          >Hello {{ auth.$state.session.user?.username }}</label
+        >
       </nav>
     </div>
   </header>
