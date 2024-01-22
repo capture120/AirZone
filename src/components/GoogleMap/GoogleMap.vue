@@ -4,7 +4,7 @@ import { onMounted } from 'vue'
 import { ref } from 'vue'
 import { type SelectionBoundary, type Location } from '../../types/global-types'
 import { useAuthStore } from '@/stores/auth'
-import { useLocationStore } from '@/stores/locations'
+import { useLocationStore } from '@/stores/location'
 import { useRouter } from 'vue-router'
 
 
@@ -51,7 +51,7 @@ onMounted(async () => {
     },
     fullscreenControl: false,
     streetViewControl: false,
-    scaleControl: false
+    scaleControl: false,
   })
 
   /* HEATMAP */
@@ -86,9 +86,8 @@ onMounted(async () => {
     tileSize: new google.maps.Size(256, 256)
   })
   pollenHeatmapLayer.setOpacity(0.5)
-
   // Overlay the heatmap tiles on the map
-  map.overlayMapTypes.insertAt(0, pollenHeatmapLayer)
+  // map.overlayMapTypes.insertAt(0, pollenHeatmapLayer)
 
   function togglePollenHeatmap(): void {
     if (map.overlayMapTypes.getLength() > 0) {
@@ -197,10 +196,10 @@ async function handleSaveLocation() {
     return;
   } 
   const currentBounds = locationSelector.getBounds()
-  const north = currentBounds?.getCenter().lat() as number
-  const east = currentBounds?.getCenter().lng() as number
-  const south = currentBounds?.getCenter().lat() as number
-  const west = currentBounds?.getCenter().lng() as number
+  const north = currentBounds?.getNorthEast().lat() as number
+  const east = currentBounds?.getNorthEast().lng() as number
+  const south = currentBounds?.getSouthWest().lat() as number
+  const west = currentBounds?.getSouthWest().lng() as number
   const center = currentBounds?.getCenter()
   const savedLocation = {
     lat: center?.lat(),
