@@ -195,6 +195,7 @@ async function handleSaveLocation() {
     router.push({ path: '/signin' });
     return;
   } 
+  const title = window.prompt('Enter the title:')
   const currentBounds = locationSelector.getBounds()
   const north = currentBounds?.getNorthEast().lat() as number
   const east = currentBounds?.getNorthEast().lng() as number
@@ -204,25 +205,18 @@ async function handleSaveLocation() {
   const savedLocation = {
     lat: center?.lat(),
     lng: center?.lng(),
-    zoom: heatmapZoom,
+    zoom: map.getZoom(),
     boundNorth: north,
     boundSouth: south,
     boundEast: east,
     boundWest: west,
     heatmapGridSizeX: heatmapXCord,
     heatmapGridSizeY: heatmapYCord,
-    title: 'default'
+    title: title
   } as Location
   await locationStore.savedLocation(savedLocation)
-
-  if (!location) {
-    alert('Saving location failed.')
-  } else {
-    alert('Location saved.')
-  }
   isSelecting.value=false
   locationSelector.setVisible(false);
-  // console.log(`North ${north}\n`, `South ${south}\n`, `East ${east}\n`,`west ${west}`)
 }
 </script>
 

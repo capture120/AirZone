@@ -10,17 +10,21 @@ const password = ref('')
 const router = useRouter()
 const registerLink = '/register'
 
-async function signin(): Promise<boolean | undefined> {
-  if (username.value === '' || password.value === '') {
-    alert('Must enter valid username/password')
-    return false
+async function signin() {
+  if (username.value === '') {
+    alert('Must enter a valid username.')
+    return;
+  } else if (password.value === '') {
+    alert('Must enter a valid password.')
+    return;
   }
-  await authStore.signin({ username: username.value, password: password.value } as User)
-  const user = authStore.$state.session.user
-  if (!user) {
-    console.log('Login Failed.')
+  const success = await authStore.signin({ username: username.value, password: password.value } as User)
+  if (success) {
+    router.push({ path: '/' })
+  } else {
+    username.value = ''
+    password.value = ''
   }
-  router.push({ path: '/' })
 }
 </script>
 

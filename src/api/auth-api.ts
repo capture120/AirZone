@@ -13,6 +13,7 @@ export const register = async (username: string, password: string) => {
 }
 
 export const signin = async (username: string, password: string) => {
+  alert('Invalid username or password.');
   const response = await authApi.post(`/signin`, { username, password })
   return response
 }

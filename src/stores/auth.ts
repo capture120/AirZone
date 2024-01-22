@@ -38,17 +38,16 @@ export const useAuthStore = defineStore('user', () => {
     }
   }
 
-  async function signin(userDetails: User) {
-    if (userDetails.username == '' || userDetails.password == '' || !userDetails.password) {
-      return;
-    }
-    const response = await authApi.signin(userDetails.username, userDetails.password)
+  async function signin(userDetails: User): Promise<boolean> {
+    const response = await authApi.signin(userDetails.username, userDetails.password as string)
     const signedinUser = response.data as User;
     if (signedinUser) {
       session.user = signedinUser;
       session.csrfToken = response.headers['csrfToken'];
       localStorage.setItem('user', JSON.stringify(session.user));
+      return true;
     }
+    return false;
   }
 
   async function logout() {

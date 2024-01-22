@@ -23,6 +23,11 @@ onMounted(async () => {
     <ul v-if="authStore.$state.session.user" >
         <li v-for="location in user.savedLocations" v-bind:key="location._id">
           <a :href="'/location/' + location._id">{{ location.title }}</a>
+          <ul>
+            <li v-for="(value, key) in location" :key="key">
+              {{ key }}: {{ value }}
+            </li>
+          </ul>
         </li>
     </ul>
   </div>

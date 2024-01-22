@@ -2,8 +2,6 @@
 import { Loader } from '@googlemaps/js-api-loader'
 import { onMounted } from 'vue'
 import { type Location } from '../../types/global-types'
-import { useAuthStore } from '@/stores/auth'
-import { ref } from 'vue'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID as string
@@ -17,57 +15,64 @@ const props = defineProps<{
 }>()
 
 onMounted(async () => {
-  const { Map } = await loader.importLibrary('maps')
-  map = new Map(document.getElementById('map') as HTMLElement, {
-    zoom: props.location.zoom,
-    center: {lat: props.location.lat, lng: props.location.lng},
-    mapId: GOOGLE_MAP_ID,
-    minZoom: props.location.zoom,
-    maxZoom: props.location.zoom,
-    restriction: {
-      latLngBounds: {
-        north: props.location.boundNorth,
-        south: props.location.boundSouth,
-        east: props.location.boundEast,
-        west: props.location.boundWest
+  if (props.location)
+  {
+    console.log(props.location.zoom)
+    const { Map } = await loader.importLibrary('maps')
+    map = new Map(document.getElementById('map') as HTMLElement, {
+      zoom: props.location.zoom,
+      center: { lat: props.location.lat, lng: props.location.lng },
+      mapId: GOOGLE_MAP_ID,
+      minZoom: 3,
+      maxZoom: 16,
+      restriction: {
+        latLngBounds: {
+          north: props.location.boundNorth,
+          south: props.location.boundSouth,
+          east: props.location.boundEast,
+          west: props.location.boundWest
+        },
+        strictBounds: true
       },
-      strictBounds: true
-    },
-    fullscreenControl: false,
-    streetViewControl: false,
-    scaleControl: false,
-    rotateControl: false,
-    zoomControl: false,
-    mapTypeControl: false,
-    clickableIcons: false,
-    disableDefaultUI: true,
-    scrollwheel: false,
-    draggable: false,
-    keyboardShortcuts: false,
-    disableDoubleClickZoom: true,
-    gestureHandling: 'none',
-  })
+      fullscreenControl: false,
+      streetViewControl: false,
+      scaleControl: false,
+      rotateControl: false,
+      zoomControl: false,
+      mapTypeControl: false,
+      clickableIcons: false,
+      disableDefaultUI: true,
+      scrollwheel: false,
+      draggable: false,
+      keyboardShortcuts: false,
+      disableDoubleClickZoom: true,
+      gestureHandling: 'none',
+    })
 
-  /* HEATMAP */
-  const pollenType = 'TREE_UPI'
-  heatmapTileURL = `https://pollen.googleapis.com/v1/mapTypes/${pollenType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
+    /* HEATMAP */
+    const pollenType = 'TREE_UPI'
+    heatmapTileURL = `https://pollen.googleapis.com/v1/mapTypes/${pollenType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
 
-  // Create a new ImageMapType with the heatmap tile URL
-  pollenHeatmapLayer = new google.maps.ImageMapType({
-    getTileUrl: function (coord, zoom) {
-      let north = map.getBounds()?.getNorthEast().lat() as number
-      let south = map.getBounds()?.getSouthWest().lat() as number
-      if (north > 80 || south < -80) {
-        return ''
-      }
-      // @ts-ignore
-      return heatmapTileURL.replace('{z}', zoom).replace('{x}', coord.x).replace('{y}', coord.y)
-    },
-    tileSize: new google.maps.Size(256, 256)
-  })
-  pollenHeatmapLayer.setOpacity(0.5)
-  map.overlayMapTypes.insertAt(0, pollenHeatmapLayer)
+    // Create a new ImageMapType with the heatmap tile URL
+    pollenHeatmapLayer = new google.maps.ImageMapType({
+      getTileUrl: function (coord, zoom) {
+        console.log('called')
+        let north = map.getBounds()?.getNorthEast().lat() as number
+        let south = map.getBounds()?.getSouthWest().lat() as number
+        if (north > 80 || south < -80) {
+          return ''
+        }
+        // @ts-ignore
+        return heatmapTileURL.replace('{z}', zoom).replace('{x}', coord.x).replace('{y}', coord.y)
+      },
+      tileSize: new google.maps.Size(256, 256)
+    })
+    pollenHeatmapLayer.setOpacity(0.5)
+    map.overlayMapTypes.insertAt(0, pollenHeatmapLayer)
+  }
 })
+
+
 
 
 
