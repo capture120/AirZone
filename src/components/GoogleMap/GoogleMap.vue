@@ -4,7 +4,7 @@ import { onMounted } from 'vue'
 import { ref } from 'vue'
 import { type SelectionBoundary, type Location } from '../../types/global-types'
 import { useAuthStore } from '@/stores/auth'
-import { useLocationStore } from '@/stores/locations'
+import { useLocationStore } from '@/stores/location'
 import { useRouter } from 'vue-router'
 
 
@@ -86,7 +86,6 @@ onMounted(async () => {
     tileSize: new google.maps.Size(256, 256)
   })
   pollenHeatmapLayer.setOpacity(0.5)
-
   // Overlay the heatmap tiles on the map
   map.overlayMapTypes.insertAt(0, pollenHeatmapLayer)
 

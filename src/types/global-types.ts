@@ -1,5 +1,6 @@
 export interface UserSession {
   user: User | null
+  csrfToken: string | null
 }
 
 export interface User {

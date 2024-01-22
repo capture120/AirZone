@@ -5,9 +5,7 @@ import { details, saveLocation } from '../api/location-api'
 import type { LocationSession } from '@/types/global-types'
 import { type Location } from '@/types/global-types'
 
-
 const auth = useAuthStore();
-
 export const useLocationStore = defineStore('location', () => {
   /* State */
   const session = reactive({ savedLocations: [] } as LocationSession)
@@ -19,13 +17,23 @@ export const useLocationStore = defineStore('location', () => {
     } 
     return [];
   })
-
+  
   /* Actions */
+  
+  function getLocationById(id: string): Location | null {
+    if (auth.$state.session.user) {
+      const savedLocation = session.savedLocations.find((location) => location._id = id)
+      if (savedLocation !== undefined) {
+        return savedLocation;
+      }
+    } 
+    return null;
+  }
+
   async function savedLocation(locationDetails: Location) {
       if (auth.$state.session.user) {
           const location = await saveLocation(locationDetails);
           if (location) {
-              console.log(JSON.stringify(location));
               session.savedLocations.push(location);
           } else {
               console.error('Location Save Failed');
@@ -43,5 +51,5 @@ export const useLocationStore = defineStore('location', () => {
     } 
   }
 
-  return { session: session, getSavedLocations: getSavedLocations, savedLocation:savedLocation, updateLatestLocations: updateLatestLocations }
+  return { session: session, getSavedLocations: getSavedLocations, getLocationById: getLocationById, savedLocation:savedLocation, updateLatestLocations: updateLatestLocations }
 })
