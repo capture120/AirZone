@@ -1,17 +1,16 @@
 import axios from 'axios'
 import type { Location, User } from '@/types/global-types'
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/stores/auth'
 
 const apiUrl = import.meta.env.VITE_REST_API_URL as string
 const userLocationsApi = axios.create({
   withCredentials: true,
-  baseURL: apiUrl + '/user',
+  baseURL: apiUrl + '/user'
 })
 const locationApi = axios.create({
   withCredentials: true,
-  baseURL: apiUrl + '/location',
+  baseURL: apiUrl + '/location'
 })
-
 
 export const saveLocation = async (location: Location) => {
   const authStore = useAuthStore()

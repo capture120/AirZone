@@ -1,5 +1,5 @@
-import axios from 'axios'
-import { useAuthStore } from '@/stores/auth';
+import axios, { type AxiosResponse } from 'axios'
+import { useAuthStore } from '@/stores/auth'
 
 const apiUrl = import.meta.env.VITE_REST_API_URL as string
 const authApi = axios.create({
@@ -7,15 +7,26 @@ const authApi = axios.create({
   baseURL: apiUrl + '/user'
 })
 
+// authApi.interceptors.response.use(function (response) {
+//   return response;
+// }, function (error) {
+//   return Promise.reject(error);
+// });
+
 export const register = async (username: string, password: string) => {
   const response = await authApi.post(`/register`, { username, password, savedLocations: [] })
   return response
 }
 
 export const signin = async (username: string, password: string) => {
-  alert('Invalid username or password.');
-  const response = await authApi.post(`/signin`, { username, password })
-  return response
+  let response: AxiosResponse<any, any> | null
+  try {
+    response = await authApi.post(`/signin`, { username, password })
+    return response
+  } catch (error) {
+    response = null
+    return response
+  }
 }
 
 export const logout = async () => {

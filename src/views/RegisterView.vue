@@ -33,5 +33,3 @@ async function Register(): Promise<boolean | undefined> {
     <input v-model="password" :required="true" type="password" />
   </div>
 </template>
-
-<style></style>

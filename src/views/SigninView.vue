@@ -13,15 +13,19 @@ const registerLink = '/register'
 async function signin() {
   if (username.value === '') {
     alert('Must enter a valid username.')
-    return;
+    return
   } else if (password.value === '') {
     alert('Must enter a valid password.')
-    return;
+    return
   }
-  const success = await authStore.signin({ username: username.value, password: password.value } as User)
-  if (success) {
+  const response = await authStore.signin({
+    username: username.value,
+    password: password.value
+  } as User)
+  if (response?.status === 200) {
     router.push({ path: '/' })
   } else {
+    alert('Invalid username or password.')
     username.value = ''
     password.value = ''
   }
@@ -39,5 +43,3 @@ async function signin() {
     <div>New User? <a v-bind:href="registerLink"> Register Here </a></div>
   </div>
 </template>
-
-<style></style>
