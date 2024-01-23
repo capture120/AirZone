@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { Loader } from '@googlemaps/js-api-loader'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { type Location } from '../../types/global-types'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID as string
 const loader = new Loader({ apiKey: GOOGLE_MAPS_API_KEY });
 let map: google.maps.Map
-let heatmapTileURL: string
-let pollenHeatmapLayer: google.maps.ImageMapType
+let pollenHeatmapTileURL: string;
+let airHeatmapTileUrl: string;
+let pollenHeatmapLayer: google.maps.ImageMapType;
+let airHeatmapLayer: google.maps.ImageMapType;
+let pollenLayerOn = ref(true);
+let airLayerOn = ref(false);
 
 const props = defineProps<{
   location: Location
@@ -17,7 +21,6 @@ const props = defineProps<{
 onMounted(async () => {
   if (props.location)
   {
-    console.log(props.location.zoom)
     const { Map } = await loader.importLibrary('maps')
     map = new Map(document.getElementById('map') as HTMLElement, {
       zoom: props.location.zoom,
@@ -51,34 +54,80 @@ onMounted(async () => {
 
     /* HEATMAP */
     const pollenType = 'TREE_UPI'
-    heatmapTileURL = `https://pollen.googleapis.com/v1/mapTypes/${pollenType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
+    const airQualityType = 'UAQI_RED_GREEN'
+    pollenHeatmapTileURL = `https://pollen.googleapis.com/v1/mapTypes/${pollenType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
+    airHeatmapTileUrl = `https://airquality.googleapis.com/v1/mapTypes/${airQualityType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
 
     // Create a new ImageMapType with the heatmap tile URL
     pollenHeatmapLayer = new google.maps.ImageMapType({
       getTileUrl: function (coord, zoom) {
-        console.log('called')
         let north = map.getBounds()?.getNorthEast().lat() as number
         let south = map.getBounds()?.getSouthWest().lat() as number
         if (north > 80 || south < -80) {
           return ''
         }
         // @ts-ignore
-        return heatmapTileURL.replace('{z}', zoom).replace('{x}', coord.x).replace('{y}', coord.y)
+        return pollenHeatmapTileURL.replace('{z}', zoom).replace('{x}', coord.x).replace('{y}', coord.y)
       },
       tileSize: new google.maps.Size(256, 256)
     })
     pollenHeatmapLayer.setOpacity(0.5)
-    map.overlayMapTypes.insertAt(0, pollenHeatmapLayer)
+    map.overlayMapTypes.insertAt(1, pollenHeatmapLayer)
+
+    airHeatmapLayer = new google.maps.ImageMapType({
+    getTileUrl: function (coord, zoom) {
+      let north = map.getBounds()?.getNorthEast().lat() as number
+      let south = map.getBounds()?.getSouthWest().lat() as number
+      if (north > 80 || south < -80) {
+        return ''
+      }
+      // @ts-ignore
+      return airHeatmapTileUrl.replace('{z}', zoom).replace('{x}', coord.x).replace('{y}', coord.y)
+    },
+    tileSize: new google.maps.Size(256, 256)
+  })
+  airHeatmapLayer.setOpacity(0)
+  map.overlayMapTypes.insertAt(0, airHeatmapLayer)
   }
+
+  function togglePollenHeatmapOpacity(): void {
+    if (pollenLayerOn.value) {
+      pollenLayerOn.value = false;
+      pollenHeatmapLayer.setOpacity(0);
+    } else {
+      if (airLayerOn.value) {
+        airLayerOn.value = false;
+        airHeatmapLayer.setOpacity(0);
+      }
+      pollenLayerOn.value = true;
+      pollenHeatmapLayer.setOpacity(0.5);
+    }
+  }
+
+  function toggleAirHeatmapOpacity(): void {
+    if (airLayerOn.value) {
+      airLayerOn.value = false;
+      airHeatmapLayer.setOpacity(0);
+    } else {
+      if (pollenLayerOn.value) {
+        pollenLayerOn.value = false;
+        pollenHeatmapLayer.setOpacity(0);
+      }
+      airLayerOn.value = true;
+      airHeatmapLayer.setOpacity(0.5);
+    }
+  }
+  document.getElementById('toggle-pollen-heatmap')!.addEventListener('click', togglePollenHeatmapOpacity)
+  document.getElementById('toggle-air-heatmap')!.addEventListener('click', toggleAirHeatmapOpacity)
 })
-
-
-
-
 
 </script>
 
 <template>
+  <div id="floating-panel">
+    <button id="toggle-pollen-heatmap">Toggle Pollen Layer</button>
+    <button id="toggle-air-heatmap">Toggle Air Quality Layer</button>
+  </div>
   <div>
     <div class="google-map" id="map"></div>
   </div>
