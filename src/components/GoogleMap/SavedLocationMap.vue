@@ -52,47 +52,47 @@ onMounted(async () => {
     })
 
     /* HEATMAP */
-    const pollenType = 'TREE_UPI'
-    const airQualityType = 'UAQI_RED_GREEN'
-    pollenHeatmapTileURL = `https://pollen.googleapis.com/v1/mapTypes/${pollenType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
-    airHeatmapTileUrl = `https://airquality.googleapis.com/v1/mapTypes/${airQualityType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
+    // const pollenType = 'TREE_UPI'
+    // const airQualityType = 'UAQI_RED_GREEN'
+    // pollenHeatmapTileURL = `https://pollen.googleapis.com/v1/mapTypes/${pollenType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
+    // airHeatmapTileUrl = `https://airquality.googleapis.com/v1/mapTypes/${airQualityType}/heatmapTiles/{z}/{x}/{y}?key=${GOOGLE_MAPS_API_KEY}`
 
-    // Create a new ImageMapType with the heatmap tile URL
-    pollenHeatmapLayer = new google.maps.ImageMapType({
-      getTileUrl: function (coord, zoom) {
-        let north = map.getBounds()?.getNorthEast().lat() as number
-        let south = map.getBounds()?.getSouthWest().lat() as number
-        if (north > 80 || south < -80) {
-          return ''
-        }
-        // @ts-ignore
-        return pollenHeatmapTileURL
-          .replace('{z}', zoom.toString())
-          .replace('{x}', coord.x.toString())
-          .replace('{y}', coord.y.toString())
-      },
-      tileSize: new google.maps.Size(256, 256)
-    })
-    pollenHeatmapLayer.setOpacity(0.5)
-    map.overlayMapTypes.insertAt(1, pollenHeatmapLayer)
+    // // Create a new ImageMapType with the heatmap tile URL
+    // pollenHeatmapLayer = new google.maps.ImageMapType({
+    //   getTileUrl: function (coord, zoom) {
+    //     let north = map.getBounds()?.getNorthEast().lat() as number
+    //     let south = map.getBounds()?.getSouthWest().lat() as number
+    //     if (north > 80 || south < -80) {
+    //       return ''
+    //     }
+    //     // @ts-ignore
+    //     return pollenHeatmapTileURL
+    //       .replace('{z}', zoom.toString())
+    //       .replace('{x}', coord.x.toString())
+    //       .replace('{y}', coord.y.toString())
+    //   },
+    //   tileSize: new google.maps.Size(256, 256)
+    // })
+    // pollenHeatmapLayer.setOpacity(0.5)
+    // map.overlayMapTypes.insertAt(1, pollenHeatmapLayer)
 
-    airHeatmapLayer = new google.maps.ImageMapType({
-      getTileUrl: function (coord, zoom) {
-        let north = map.getBounds()?.getNorthEast().lat() as number
-        let south = map.getBounds()?.getSouthWest().lat() as number
-        if (north > 80 || south < -80) {
-          return ''
-        }
-        // @ts-ignore
-        return airHeatmapTileUrl
-          .replace('{z}', zoom.toString())
-          .replace('{x}', coord.x.toString())
-          .replace('{y}', coord.y.toString())
-      },
-      tileSize: new google.maps.Size(256, 256)
-    })
-    airHeatmapLayer.setOpacity(0)
-    map.overlayMapTypes.insertAt(0, airHeatmapLayer)
+    // airHeatmapLayer = new google.maps.ImageMapType({
+    //   getTileUrl: function (coord, zoom) {
+    //     let north = map.getBounds()?.getNorthEast().lat() as number
+    //     let south = map.getBounds()?.getSouthWest().lat() as number
+    //     if (north > 80 || south < -80) {
+    //       return ''
+    //     }
+    //     // @ts-ignore
+    //     return airHeatmapTileUrl
+    //       .replace('{z}', zoom.toString())
+    //       .replace('{x}', coord.x.toString())
+    //       .replace('{y}', coord.y.toString())
+    //   },
+    //   tileSize: new google.maps.Size(256, 256)
+    // })
+    // airHeatmapLayer.setOpacity(0)
+    // map.overlayMapTypes.insertAt(0, airHeatmapLayer)
   }
 })
 function togglePollenHeatmapOpacity(): void {
@@ -125,19 +125,19 @@ function toggleAirHeatmapOpacity(): void {
 </script>
 
 <template>
-  <v-container class="tw-rounded-lg">
-    <v-row justify="center" class="my-4">
-      <v-btn color="light-blue lighten-3" class="tw-mr-2" @click="togglePollenHeatmapOpacity"
-        >Toggle Pollen Layer</v-btn
-      >
-      <v-btn color="light-blue lighten-3" class="tw-mr-2" @click="toggleAirHeatmapOpacity"
-        >Toggle Air Quality Layer</v-btn
-      >
-    </v-row>
+  <div>
     <div>
       <div class="google-map" id="map"></div>
     </div>
-  </v-container>
+    <v-row justify="center" class="my-4">
+      <v-btn color="light-blue lighten-3" class="tw-mr-2" @click="togglePollenHeatmapOpacity"
+      >Toggle Pollen Layer</v-btn
+      >
+      <v-btn color="light-blue lighten-3" class="tw-mr-2" @click="toggleAirHeatmapOpacity"
+      >Toggle Air Quality Layer</v-btn
+      >
+    </v-row>
+  </div>
 </template>
 
 <style scoped>

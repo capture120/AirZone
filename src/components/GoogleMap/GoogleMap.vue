@@ -272,6 +272,9 @@ async function handleSaveLocation() {
 
 <template>
   <v-container class="tw-rounded-lg">
+    <div>
+      <div class="google-map" id="map"></div>
+    </div>
     <v-row justify="center" class="my-4">
       <v-btn color="light-blue lighten-3" class="tw-mr-2" @click="togglePollenHeatmap"
         >Toggle Pollen Layer</v-btn
@@ -304,9 +307,6 @@ async function handleSaveLocation() {
         >Save Location</v-btn
       >
     </v-row>
-    <div>
-      <div class="google-map" id="map"></div>
-    </div>
   </v-container>
 </template>
 
