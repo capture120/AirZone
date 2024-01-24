@@ -7,7 +7,7 @@ import NavBar from './components/NavBar.vue'
     <v-main>
       <div class="tw-min-h-screen tw-flex tw-flex-col">
         <NavBar/>
-        <router-view class="tw-mt-[2%]"/>
+        <router-view class="tw-mt-[4%]"/>
       </div>
     </v-main>
   </v-app>

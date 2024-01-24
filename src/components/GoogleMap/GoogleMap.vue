@@ -276,20 +276,19 @@ async function handleSaveLocation() {
 </script>
 
 <template>
-  <v-alert
-      v-model="showAlert"
-      type="success"
-      border="start"
-      closable
-      close-label="Close Alert"
-      elevation="2"
-      icon="mdi-check-circle-outline"
-      @input="() =>showAlert = false"
-      @click:close="() => showAlert = false"
-    >
-      Saving successful!
-  </v-alert>
   <v-container class="tw-rounded-lg">
+    <v-alert
+        v-model="showAlert"
+        type="success"
+        closable
+        close-label="Close Alert"
+        elevation="2"
+        icon="mdi-check-circle-outline"
+        @input="() =>showAlert = false"
+        @click:close="() => showAlert = false"
+      >
+        Saving successful!
+    </v-alert>
     <div>
       <div class="google-map" id="map"></div>
     </div>
