@@ -12,7 +12,7 @@ async function logout() {
 </script>
 
 <template>
-  <nav>
+  <nav class="tw-w-screen tw-fixed tw-z-20 tw-shadow-md">
     <v-toolbar :elevation="3">
       <v-toolbar-items class="sm:tw-pl-8" prominent>
         <v-btn to="/">
