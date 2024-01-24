@@ -1,50 +1,40 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { useLocationStore } from '@/stores/location';
-import type { LocationSession } from '@/types/global-types';
-const authStore = useAuthStore();
-const locationStore = useLocationStore();
+import { onMounted, reactive } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useLocationStore } from '@/stores/location'
+import type { LocationSession } from '@/types/global-types'
+import { VList } from 'vuetify/components'
+import AirReportCard from '@/components/AirReportCard.vue'
+const authStore = useAuthStore()
+const locationStore = useLocationStore()
 const user = reactive({} as LocationSession)
 
 onMounted(async () => {
   if (authStore.$state.session.user) {
-    await locationStore.updateLatestLocations();
-    user.savedLocations = locationStore.getSavedLocations;
+    await locationStore.updateLatestLocations()
+    user.savedLocations = locationStore.getSavedLocations
   }
 })
 </script>
 
 <template>
-  <div class="home">
-    <h1>This is the Home Page</h1>
-  </div>
-  <div>
-    <ul v-if="authStore.$state.session.user" >
-        <li v-for="location in user.savedLocations" v-bind:key="location._id">
-          <a :href="'/location/' + location._id">{{ location.title }}</a>
-          <ul>
-            <li v-for="(value, key) in location" :key="key">
-              {{ key }}: {{ value }}
-            </li>
-          </ul>
-        </li>
-    </ul>
+  <div class="tw-max-w-80%">
+    <v-container class="tw-rounded-lg">
+      <VRow v-if="authStore.$state.session.user" class="d-flex align-center justify-space-evenly
+" rounded rounded-circle>
+        <VCol
+          v-for="location in user.savedLocations"
+          v-bind:key="location._id"
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+          class="tw-my-6"
+        >
+          <AirReportCard :location="location" />
+        </VCol>
+      </VRow>
+    </v-container>
   </div>
 </template>
-
-<style>
-@media (min-width: 1024px) {
-  .home {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
-
-ul, li {
-  margin-left: 0;
-  padding-left: 0;
-}
-</style>
 @/stores/location

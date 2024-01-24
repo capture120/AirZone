@@ -1,36 +1,37 @@
 <script setup lang="ts">
-defineProps<{
-  msg: string
-}>()
+import router from '@/router'
+import { useAuthStore } from '../stores/auth'
+import logo from '@/assets/navbar/AirzoneLogo.png'
+
+const auth = useAuthStore()
+
+async function logout() {
+  await auth.logout()
+  router.push('/')
+}
 </script>
 
 <template>
-  <div class="greetings">
-    <h1 class="green">{{ msg }}</h1>
-  </div>
+  <nav class="tw-w-screen tw-fixed tw-z-20 tw-shadow-md">
+    <v-toolbar :elevation="3">
+      <v-toolbar-items class="sm:tw-pl-8" prominent>
+        <v-btn to="/">
+          <img :src="logo" class="tw-w-14 md:tw-m-2 md:tw-w-16" />
+        </v-btn>
+        <v-btn to="/map"> <p class="md:tw-m-2">Map</p></v-btn>
+      </v-toolbar-items>
+      <v-spacer></v-spacer>
+      <v-toolbar-items prominent>
+        <v-btn v-if="!auth.$state.session.user" to="/signin">Sign-in</v-btn>
+        <v-btn v-if="auth.$state.session.user" @click="logout">Log Out</v-btn>
+        <v-btn flat>
+          <label class="tw-pr-3" v-if="auth.$state.session.user">{{
+            auth.$state.session.user?.username
+          }}</label>
+          <v-icon>mdi-account</v-icon>
+        </v-btn>
+      </v-toolbar-items>
+    </v-toolbar>
+  </nav>
 </template>
-
-<style scoped>
-h1 {
-  font-weight: 500;
-  font-size: 2.6rem;
-  position: relative;
-  top: -10px;
-}
-
-h3 {
-  font-size: 1.2rem;
-}
-
-.greetings h1,
-.greetings h3 {
-  text-align: center;
-}
-
-@media (min-width: 1024px) {
-  .greetings h1,
-  .greetings h3 {
-    text-align: left;
-  }
-}
-</style>
+<style scoped></style>

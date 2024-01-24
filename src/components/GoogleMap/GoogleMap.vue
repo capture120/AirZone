@@ -7,23 +7,23 @@ import { useAuthStore } from '@/stores/auth'
 import { useLocationStore } from '@/stores/location'
 import { useRouter } from 'vue-router'
 
-
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
-const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID as string;
-const loader = new Loader({ apiKey: GOOGLE_MAPS_API_KEY });
-const authStore = useAuthStore();
-const locationStore = useLocationStore();
-const router = useRouter();
-let map: google.maps.Map;
-let locationSelector: google.maps.Rectangle;
-let pollenHeatmapTileURL: string;
-let airHeatmapTileUrl: string;
-let pollenHeatmapLayer: google.maps.ImageMapType;
-let airHeatmapLayer: google.maps.ImageMapType;
-let heatmapXCord: number;
-let heatmapYCord: number;
-let pollenLayerOn = ref(false);
-let airLayerOn = ref(false);
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
+const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID as string
+const loader = new Loader({ apiKey: GOOGLE_MAPS_API_KEY })
+const authStore = useAuthStore()
+const locationStore = useLocationStore()
+const router = useRouter()
+let map: google.maps.Map
+let locationSelector: google.maps.Rectangle
+let pollenHeatmapTileURL: string
+let airHeatmapTileUrl: string
+let pollenHeatmapLayer: google.maps.ImageMapType
+let airHeatmapLayer: google.maps.ImageMapType
+let heatmapXCord: number
+let heatmapYCord: number
+let pollenLayerOn = ref(false)
+let airLayerOn = ref(false)
+const showAlert = ref(false)
 
 /* Map Default Position */
 const lat = 41.85
@@ -54,7 +54,7 @@ onMounted(async () => {
     },
     fullscreenControl: false,
     streetViewControl: false,
-    scaleControl: false,
+    scaleControl: false
   })
 
   /* HEATMAP */
@@ -64,7 +64,6 @@ onMounted(async () => {
   GRASS_UPI
   WEED_UPI
   */
-  // Define the heatmap tile URL pattern
   const pollenType = 'TREE_UPI'
   const airQualityType = 'UAQI_RED_GREEN'
   /* 
@@ -85,7 +84,10 @@ onMounted(async () => {
       heatmapXCord = coord.x
       heatmapYCord = coord.y
       // @ts-ignore
-      return pollenHeatmapTileURL.replace('{z}', zoom).replace('{x}', coord.x).replace('{y}', coord.y)
+      return pollenHeatmapTileURL
+        .replace('{z}', zoom.toString())
+        .replace('{x}', coord.x.toString())
+        .replace('{y}', coord.y.toString())
     },
     tileSize: new google.maps.Size(256, 256)
   })
@@ -105,67 +107,6 @@ onMounted(async () => {
   })
   airHeatmapLayer.setOpacity(0.5)
 
-  function togglePollenHeatmap(): void {
-    if (pollenLayerOn.value) {
-      pollenLayerOn.value = false;
-      map.overlayMapTypes.removeAt(0)
-    } else {
-      if (airLayerOn.value) {
-        airLayerOn.value = false;
-        map.overlayMapTypes.removeAt(0)
-      }
-      pollenLayerOn.value = true;
-      map.overlayMapTypes.insertAt(0, pollenHeatmapLayer)
-    }
-  }
-
-  function toggleAirHeatmap(): void {
-    if (airLayerOn.value) {
-      airLayerOn.value = false;
-      map.overlayMapTypes.removeAt(0)
-    } else {
-      if (pollenLayerOn.value) {
-        pollenLayerOn.value = false;
-        map.overlayMapTypes.removeAt(0);
-      }
-      airLayerOn.value = true;
-      map.overlayMapTypes.insertAt(0, airHeatmapLayer)
-    }
-  }
-
-  function toggleOpacity(): void {
-    const opacity = pollenHeatmapLayer.getOpacity()
-    switch (opacity) {
-      case 0:
-        pollenHeatmapLayer.setOpacity(0.2)
-        airHeatmapLayer.setOpacity(0.2)
-        break
-      case 0.2:
-        pollenHeatmapLayer.setOpacity(0.35)
-        airHeatmapLayer.setOpacity(0.35)
-        break
-      case 0.35:
-        pollenHeatmapLayer.setOpacity(0.5)
-        airHeatmapLayer.setOpacity(0.5)
-        break
-      case 0.5:
-        pollenHeatmapLayer.setOpacity(0.7)
-        airHeatmapLayer.setOpacity(0.7)
-        break
-      case 0.7:
-        pollenHeatmapLayer.setOpacity(0)
-        airHeatmapLayer.setOpacity(0)
-        break
-      default:
-        pollenHeatmapLayer.setOpacity(0.2)
-        airHeatmapLayer.setOpacity(0.2)
-        break
-    }
-  }
-  document.getElementById('toggle-pollen-heatmap')!.addEventListener('click', togglePollenHeatmap)
-  document.getElementById('toggle-air-heatmap')!.addEventListener('click', toggleAirHeatmap)
-  document.getElementById('toggle-opacity')!.addEventListener('click', toggleOpacity)
-
   /* Location Saving */
   locationSelector = new google.maps.Rectangle({
     map: map,
@@ -177,11 +118,20 @@ onMounted(async () => {
 
   /* User Position Focus */
   const locationButton = document.createElement('button')
-
   locationButton.textContent = 'View Current Location'
   locationButton.classList.add('custom-map-control-button')
-
-  map.controls[google.maps.ControlPosition.BLOCK_START_INLINE_START].push(locationButton)
+  locationButton.style.backgroundColor = '#fff'
+  locationButton.style.border = '2px solid #fff'
+  locationButton.style.borderRadius = '3px'
+  locationButton.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)'
+  locationButton.style.color = 'rgb(25,25,25)'
+  locationButton.style.cursor = 'pointer'
+  locationButton.style.fontFamily = 'Roboto,Arial,sans-serif'
+  locationButton.style.fontSize = '16px'
+  locationButton.style.lineHeight = '38px'
+  locationButton.style.margin = '8px 0 22px'
+  locationButton.style.padding = '0 5px'
+  map.controls[google.maps.ControlPosition.BLOCK_START_INLINE_CENTER].push(locationButton)
 
   locationButton.addEventListener('click', () => {
     // Try HTML5 geolocation.
@@ -201,6 +151,64 @@ onMounted(async () => {
     }
   })
 })
+
+function togglePollenHeatmap(): void {
+  if (pollenLayerOn.value) {
+    pollenLayerOn.value = false
+    map.overlayMapTypes.removeAt(0)
+  } else {
+    if (airLayerOn.value) {
+      airLayerOn.value = false
+      map.overlayMapTypes.removeAt(0)
+    }
+    pollenLayerOn.value = true
+    map.overlayMapTypes.insertAt(0, pollenHeatmapLayer)
+  }
+}
+
+function toggleAirHeatmap(): void {
+  if (airLayerOn.value) {
+    airLayerOn.value = false
+    map.overlayMapTypes.removeAt(0)
+  } else {
+    if (pollenLayerOn.value) {
+      pollenLayerOn.value = false
+      map.overlayMapTypes.removeAt(0)
+    }
+    airLayerOn.value = true
+    map.overlayMapTypes.insertAt(0, airHeatmapLayer)
+  }
+}
+
+function toggleOpacity(): void {
+  const opacity = pollenHeatmapLayer.getOpacity()
+  switch (opacity) {
+    case 0:
+      pollenHeatmapLayer.setOpacity(0.2)
+      airHeatmapLayer.setOpacity(0.2)
+      break
+    case 0.2:
+      pollenHeatmapLayer.setOpacity(0.35)
+      airHeatmapLayer.setOpacity(0.35)
+      break
+    case 0.35:
+      pollenHeatmapLayer.setOpacity(0.5)
+      airHeatmapLayer.setOpacity(0.5)
+      break
+    case 0.5:
+      pollenHeatmapLayer.setOpacity(0.7)
+      airHeatmapLayer.setOpacity(0.7)
+      break
+    case 0.7:
+      pollenHeatmapLayer.setOpacity(0)
+      airHeatmapLayer.setOpacity(0)
+      break
+    default:
+      pollenHeatmapLayer.setOpacity(0.2)
+      airHeatmapLayer.setOpacity(0.2)
+      break
+  }
+}
 
 function handleSelecting() {
   isSelecting.value = true
@@ -234,11 +242,14 @@ async function handleSaveLocation() {
   if (!isSelecting.value) {
     return;
   }
-  if (!authStore.$state.session.user){
-    router.push({ path: '/signin' });
+  if (!authStore.$state.session.user) {
+    router.push({ path: '/signin' })
     return;
-  } 
+  }
   const title = window.prompt('Enter the title:')
+  if (title === null || title === '') {
+    return;
+  }
   const currentBounds = locationSelector.getBounds()
   const north = currentBounds?.getNorthEast().lat() as number
   const east = currentBounds?.getNorthEast().lng() as number
@@ -258,27 +269,63 @@ async function handleSaveLocation() {
     title: title
   } as Location
   await locationStore.savedLocation(savedLocation)
-  isSelecting.value=false
-  locationSelector.setVisible(false);
+  isSelecting.value = false
+  locationSelector.setVisible(false)
+  showAlert.value = true;
 }
 </script>
 
 <template>
-  <div id="floating-panel">
-    <button id="toggle-pollen-heatmap">Toggle Pollen Layer</button>
-    <button id="toggle-air-heatmap">Toggle Air Quality Layer</button>
-    <button id="toggle-opacity">Toggle opacity</button>
-    <button v-if="!isSelecting" id="select-location" @click="handleSelecting">
-      Select Location
-    </button>
-    <button v-if="isSelecting" id="cancel-select-location" @click="handleCancelSelection">
-      Cancel
-    </button>
-    <button v-if="isSelecting" id="save-location" @click="handleSaveLocation">Save Location</button>
-  </div>
-  <div>
-    <div class="google-map" id="map"></div>
-  </div>
+  <v-alert
+      v-model="showAlert"
+      type="success"
+      border="start"
+      closable
+      close-label="Close Alert"
+      elevation="2"
+      icon="mdi-check-circle-outline"
+      @input="() =>showAlert = false"
+      @click:close="() => showAlert = false"
+    >
+      Saving successful!
+  </v-alert>
+  <v-container class="tw-rounded-lg">
+    <div>
+      <div class="google-map" id="map"></div>
+    </div>
+    <v-row justify="center" class="my-4">
+      <v-btn color="light-blue lighten-3" class="tw-mr-2" @click="togglePollenHeatmap"
+        >Toggle Pollen Layer</v-btn
+      >
+      <v-btn color="light-blue lighten-3" class="tw-mr-2" @click="toggleAirHeatmap"
+        >Toggle Air Quality Layer</v-btn
+      >
+      <v-btn color="light-blue lighten-3" class="tw-mr-2" @click="toggleOpacity"
+        >Toggle opacity</v-btn
+      >
+      <v-btn
+        v-if="!isSelecting"
+        color="light-blue lighten-3"
+        class="tw-mr-2"
+        @click="handleSelecting"
+        >Select Location</v-btn
+      >
+      <v-btn
+        v-if="isSelecting"
+        color="light-blue lighten-3"
+        class="tw-mr-2"
+        @click="handleCancelSelection"
+        >Cancel</v-btn
+      >
+      <v-btn
+        v-if="isSelecting"
+        color="light-blue lighten-3"
+        class="tw-mr-2"
+        @click="handleSaveLocation"
+        >Save Location</v-btn
+      >
+    </v-row>
+  </v-container>
 </template>
 
 <style scoped>

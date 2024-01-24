@@ -1,95 +1,14 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import { useAuthStore } from './stores/auth'
 import NavBar from './components/NavBar.vue'
-
-const auth = useAuthStore()
-
-async function logout() {
-  await auth.logout()
-}
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
-      <NavBar msg="AirZone" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/map">Map</RouterLink>
-        <RouterLink v-if="!auth.$state.session.user" to="/signin">Sign-in</RouterLink>
-        <RouterLink v-if="auth.$state.session.user" to="/" @click="logout">Log Out</RouterLink>
-        <label v-if="auth.$state.session.user"
-          >Hello {{ auth.$state.session.user?.username }}</label
-        >
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <v-app>
+    <v-main>
+      <div class="tw-min-h-screen tw-flex tw-flex-col">
+        <NavBar/>
+        <router-view class="tw-mt-[2%]"/>
+      </div>
+    </v-main>
+  </v-app>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>
