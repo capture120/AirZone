@@ -22,7 +22,9 @@ async function handleDeleteLocation() {
 
 <template>
   <v-container v-if="savedLocation" class="tw-rounded-lg">
-    <div class="tw-text-5xl tw-flex tw-justify-center tw-mt-5 tw-mb-1">{{ savedLocation.title }}</div>
+    <div class="tw-mb-3 tw-mt-3 tw-flex tw-justify-center tw-text-4xl">
+      {{ savedLocation.title.charAt(0).toUpperCase() + savedLocation.title.slice(1) }}
+    </div>
     <SavedLocationMapVue v-if="isMounted" :location="savedLocation" />
     <div class="tw-flex tw-justify-center">
       <VBtn @click="handleDeleteLocation" color="red" class="hoverable">Remove Saved Location</VBtn>

@@ -12,7 +12,7 @@ async function logout() {
 </script>
 
 <template>
-  <nav class="tw-w-screen tw-fixed tw-z-20 tw-shadow-md">
+  <nav class="tw-fixed tw-z-20 tw-w-screen tw-shadow-md">
     <v-toolbar :elevation="3">
       <v-toolbar-items class="sm:tw-pl-8" prominent>
         <v-btn to="/">
@@ -21,7 +21,7 @@ async function logout() {
         <v-btn to="/map"> <p class="md:tw-m-2">Map</p></v-btn>
       </v-toolbar-items>
       <v-spacer></v-spacer>
-      <v-toolbar-items prominent>
+      <v-toolbar-items prominent class="sm: tw-mr-6">
         <v-btn v-if="!auth.$state.session.user" to="/signin">Sign-in</v-btn>
         <v-btn v-if="auth.$state.session.user" @click="logout">Log Out</v-btn>
         <v-btn flat>

@@ -5,9 +5,9 @@ import NavBar from './components/NavBar.vue'
 <template>
   <v-app>
     <v-main>
-      <div class="tw-min-h-screen tw-flex tw-flex-col">
-        <NavBar/>
-        <router-view class="tw-mt-[4%]"/>
+      <div class="tw-flex tw-min-h-screen tw-flex-col">
+        <NavBar />
+        <router-view class="tw-mt-[4%]" />
       </div>
     </v-main>
   </v-app>

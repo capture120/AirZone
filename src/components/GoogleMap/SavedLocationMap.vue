@@ -1,38 +1,50 @@
 <script setup lang="ts">
 import { Loader } from '@googlemaps/js-api-loader'
 import { onMounted, ref } from 'vue'
-import { type Location, type SelectionBoundary } from '../../types/global-types'
+import { type Location } from '../../types/global-types'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
 const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID as string
 const loader = new Loader({ apiKey: GOOGLE_MAPS_API_KEY })
+const TILE_SIZE = 256
+
 let map: google.maps.Map
 let pollenHeatmapTileURL: string
 let airHeatmapTileUrl: string
-let boundaryVisualization: google.maps.Rectangle
 let pollenHeatmapLayer: google.maps.ImageMapType
 let airHeatmapLayer: google.maps.ImageMapType
 let pollenLayerOn = ref(true)
 let airLayerOn = ref(false)
+let mapElementWidth: number
 const props = defineProps<{
   location: Location
 }>()
-const bounds = new google.maps.LatLngBounds(
-  new google.maps.LatLng(props.location.boundSouth, props.location.boundWest),
-  new google.maps.LatLng(props.location.boundNorth, props.location.boundEast)
-)
+const bounds = {
+  north: props.location.boundNorth,
+  east: props.location.boundEast,
+  south: props.location.boundSouth,
+  west: props.location.boundWest
+}
 
 onMounted(async () => {
+  console.log(JSON.stringify(bounds))
   if (props.location) {
     const { Map } = await loader.importLibrary('maps')
-    const { AdvancedMarkerElement } = (await google.maps.importLibrary(
-      'marker'
-    )) as google.maps.MarkerLibrary
+
+    const mapElement = document.getElementById('map')
+    if (!mapElement) {
+      mapElementWidth = 0
+    } else {
+      mapElementWidth = mapElement.offsetWidth
+    }
+    console.log(mapElementWidth)
+    const zoom = calculateApproximateZoomLevel(mapElementWidth)
+
     map = new Map(document.getElementById('map') as HTMLElement, {
-      // zoom: props.location.zoom,
-      // center: { lat: props.location.lat, lng: props.location.lng },
+      zoom: zoom,
+      center: { lat: props.location.lat, lng: props.location.lng },
       mapId: GOOGLE_MAP_ID,
-      minZoom: props.location.zoom,
+      minZoom: 3,
       maxZoom: 16,
       restriction: {
         latLngBounds: {
@@ -41,7 +53,7 @@ onMounted(async () => {
           east: props.location.boundEast,
           west: props.location.boundWest
         },
-        strictBounds: true
+        strictBounds: false
       },
       fullscreenControl: false,
       streetViewControl: false,
@@ -58,19 +70,24 @@ onMounted(async () => {
       gestureHandling: 'none'
     })
 
-    new AdvancedMarkerElement({
-      map: map,
-      position: { lat: props.location.lat, lng: props.location.lng },
-      title: props.location.title
-    })
+    // new AdvancedMarkerElement({
+    //   map: map,
+    //   position: { lat: props.location.lat, lng: props.location.lng },
+    //   title: props.location.title
+    // })
 
-    boundaryVisualization = new google.maps.Rectangle({
-      map: map,
-      bounds: bounds,
-      editable: false,
-      draggable: false,
-      visible: true
-    })
+    // new google.maps.Rectangle({
+    //   map: map,
+    //   bounds: {
+    //     north: props.location.boundNorth,
+    //     south: props.location.boundSouth,
+    //     east: props.location.boundEast,
+    //     west: props.location.boundWest
+    //   },
+    //   editable: false,
+    //   draggable: false,
+    //   visible: false,
+    // })
 
     /* HEATMAP */
     // const pollenType = 'TREE_UPI'
@@ -114,36 +131,8 @@ onMounted(async () => {
     // })
     // airHeatmapLayer.setOpacity(0)
     // map.overlayMapTypes.insertAt(0, airHeatmapLayer)
-
-    // Calculate map dimensions in pixels
-    map.fitBounds(bounds, 0)
   }
 })
-
-function calculateMapDimensions() {
-  const bounds = new google.maps.LatLngBounds(
-    new google.maps.LatLng(props.location.boundSouth, props.location.boundWest),
-    new google.maps.LatLng(props.location.boundNorth, props.location.boundEast)
-  )
-
-  const projection = map.getProjection()
-  if (!projection) {
-    console.log('ohno')
-    return { width: 0, height: 0 }
-  }
-  const sw = projection.fromLatLngToPoint(bounds.getSouthWest())
-  const ne = projection.fromLatLngToPoint(bounds.getNorthEast())
-
-  if (!sw || !ne) {
-    console.log('oops')
-    return { width: 0, height: 0 }
-  }
-
-  const width = Math.abs(ne.x - sw.x) * 256 // Assuming tile size of 256x256 pixels
-  const height = Math.abs(ne.y - sw.y) * 256
-
-  return { width, height }
-}
 
 function togglePollenHeatmapOpacity(): void {
   if (pollenLayerOn.value) {
@@ -172,12 +161,36 @@ function toggleAirHeatmapOpacity(): void {
     airHeatmapLayer.setOpacity(0.5)
   }
 }
+
+function calculateApproximateZoomLevel(mapElementWidth: number): number {
+  const west = bounds.west
+  const east = bounds.east
+  let angle = east - west
+  if (angle < 0) {
+    angle += 360
+  }
+  const pixelWidth = (mapElementWidth * 360) / angle
+  /*
+   from  https://developers.google.com/maps/documentation/javascript/coordinates#tile-coordinates 
+  We want the zoom level such that the boundary is in frame. It is not exact due to:
+  - map dimensions being different than user's location selection dimension
+  We know that:
+    - pixelCoordinate = worldCoordinate * 2^(zoomLevel)
+    - each zoom level doubles the scale of the map
+    - the map is 360 degrees wide
+    - we can determine the approximate scale by which the world has been altered by the zoom level, and reduce zoom to its 
+      scaled form used by Google
+
+  */
+  const zoom = Math.round(Math.log(pixelWidth / TILE_SIZE) / Math.LN2)
+  return zoom
+}
 </script>
 
 <template>
   <div>
     <div>
-      <div class="tw-h-[80vh] tw-w-[100%]" id="map"></div>
+      <div class="tw-h-[70vh] tw-w-[100%]" id="map"></div>
     </div>
     <v-row justify="center" class="my-4">
       <v-btn color="light-blue lighten-3" class="tw-mr-2" @click="togglePollenHeatmapOpacity"

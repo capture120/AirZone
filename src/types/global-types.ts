@@ -33,3 +33,12 @@ export type SelectionBoundary = {
   east: number
   west: number
 }
+
+export const AirQualityColorMap = [
+  '',
+  'green',
+  'light-green',
+  'yellow',
+  'orange',
+  'red',
+];

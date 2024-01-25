@@ -28,14 +28,13 @@ async function signin() {
     router.push({ path: '/' })
   } else {
     showAlert.value = true
-    username.value = ''
     password.value = ''
   }
 }
 </script>
 
 <template>
-  <VRow class="tw-grow tw-flex tw-min-h-[650px]">
+  <VRow class="tw-flex tw-min-h-[650px] tw-grow">
     <v-alert
       v-model="showAlert"
       type="error"
@@ -48,9 +47,9 @@ async function signin() {
     >
       Invalid username or password.
     </v-alert>
-    <VCol lg="6" class="tw-flex tw-grow tw-justify-center tw-items-center tw-pr-5">
-      <div class="tw-flex tw-flex-col tw-justify-center tw-pb-20 tw-w-[90%] xl:tw-w-[60%]">
-        <h1 class="tw-text-4xl tw-font-bold tw-font-serif tw-mb-12">Sign In</h1>
+    <VCol lg="6" class="tw-flex tw-grow tw-items-center tw-justify-center tw-pr-5 tw-mt-24">
+      <div class="tw-flex tw-w-[90%] tw-flex-col tw-justify-center tw-pb-20 xl:tw-w-[60%]">
+        <h1 class="tw-mb-12 tw-font-serif tw-text-4xl tw-font-bold">Sign In</h1>
 
         <VTextField
           v-model="username"
@@ -69,11 +68,11 @@ async function signin() {
         />
         <VRow container class="!tw-mb-10 !tw-mt-0 tw-justify-between">
           <VCol item>
-            <div display="inline" class="tw-text-black tw-text-[12px] tw-py-1">
+            <div display="inline" class="tw-py-1 tw-text-[12px] tw-text-black">
               Don't have an account? &nbsp;
               <a
                 href="/register"
-                class="tw-py-1 tw-text-black tw-text-[12px]"
+                class="tw-py-1 tw-text-[12px] tw-text-black"
                 style="
                   text-decoration: underline;
                   text-underline-offset: 3px;
@@ -88,7 +87,7 @@ async function signin() {
           <VCol item>
             <a
               href="/"
-              class="tw-py-1 tw-text-black tw-text-[12px]"
+              class="tw-py-1 tw-text-[12px] tw-text-black"
               style="
                 text-decoration: underline;
                 text-underline-offset: 3px;
@@ -112,12 +111,8 @@ async function signin() {
         </VBtn>
       </div>
     </VCol>
-    <VCol
-      item
-      sm="6"
-      class="md:tw-flex tw-justify-center tw-items-center tw-pl-4 tw-hidden"
-    >
-      <v-img :src="Airzonelogo2" rounded rounded-circle max-height="80%"/>
+    <VCol item sm="6" class="tw-hidden tw-items-center tw-justify-center tw-pl-4 md:tw-flex">
+      <v-img :src="Airzonelogo2" rounded rounded-circle max-height="80%" />
     </VCol>
   </VRow>
 </template>

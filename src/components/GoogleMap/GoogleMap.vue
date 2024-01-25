@@ -240,15 +240,15 @@ function handleCancelSelection() {
 
 async function handleSaveLocation() {
   if (!isSelecting.value) {
-    return;
+    return
   }
   if (!authStore.$state.session.user) {
     router.push({ path: '/signin' })
-    return;
+    return
   }
   const title = window.prompt('Enter the title:')
   if (title === null || title === '') {
-    return;
+    return
   }
   const currentBounds = locationSelector.getBounds()
   const north = currentBounds?.getNorthEast().lat() as number
@@ -271,23 +271,23 @@ async function handleSaveLocation() {
   await locationStore.savedLocation(savedLocation)
   isSelecting.value = false
   locationSelector.setVisible(false)
-  showAlert.value = true;
+  showAlert.value = true
 }
 </script>
 
 <template>
   <v-container class="tw-rounded-lg">
     <v-alert
-        v-model="showAlert"
-        type="success"
-        closable
-        close-label="Close Alert"
-        elevation="2"
-        icon="mdi-check-circle-outline"
-        @input="() =>showAlert = false"
-        @click:close="() => showAlert = false"
-      >
-        Saving successful!
+      v-model="showAlert"
+      type="success"
+      closable
+      close-label="Close Alert"
+      elevation="2"
+      icon="mdi-check-circle-outline"
+      @input="() => (showAlert = false)"
+      @click:close="() => (showAlert = false)"
+    >
+      Saving successful!
     </v-alert>
     <div>
       <div class="google-map" id="map"></div>

@@ -20,16 +20,23 @@ onMounted(async () => {
 <template>
   <div class="tw-max-w-80%">
     <v-container class="tw-rounded-lg">
-      <VRow v-if="authStore.$state.session.user" class="d-flex align-center justify-space-evenly
-" rounded rounded-circle>
+      <div class="tw-flex tw-justify-center">
+        <h1 class="tw-text-4xl tw-font-bold tw-font-serif tw-m-6">Locations</h1>
+      </div>
+      <VRow
+        v-if="authStore.$state.session.user"
+        class="d-flex align-center justify-space-evenly"
+        rounded
+        rounded-circle
+      >
         <VCol
           v-for="location in user.savedLocations"
           v-bind:key="location._id"
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
           class="tw-my-6"
+          cols="4"
+          md="4"
+          sm="6"
+          xs="12"
         >
           <AirReportCard :location="location" />
         </VCol>
