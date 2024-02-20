@@ -34,6 +34,12 @@ export type SelectionBoundary = {
   west: number
 }
 
+export type LocationStat = {
+  locationId: string
+  pollenData: any
+  airQualityData: any
+}
+
 export const AirQualityColorMap = [
   '',
   'green',
